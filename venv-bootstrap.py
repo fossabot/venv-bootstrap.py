@@ -45,6 +45,19 @@ import subprocess
 import venv
 
 
+# verbatim copy from ensure_pip
+def disable_pip_configuration_settings():
+    # We deliberately ignore all pip environment variables
+    # when invoking pip
+    # See http://bugs.python.org/issue19734 for details
+    keys_to_remove = [k for k in os.environ if k.startswith("PIP_")]
+    for k in keys_to_remove:
+        del os.environ[k]
+    # We also ignore the settings in the default pip configuration file
+    # See http://bugs.python.org/issue20053 for details
+    os.environ['PIP_CONFIG_FILE'] = os.devnull
+
+
 class EnvBuilder(venv.EnvBuilder):
     def ensure_directories(self, env_dir):
         self.last_context = super().ensure_directories(env_dir)
@@ -133,6 +146,8 @@ if args.child:
     info('Failed to find "{}", trying to install using "pip"\n'.format(args.module))
 
     pip_verbose = ['--verbose'] * args.pip_verbosity
+
+    disable_pip_configuration_settings()
 
     do_bootstrap = False
     try:
