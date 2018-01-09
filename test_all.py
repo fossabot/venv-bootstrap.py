@@ -9,6 +9,32 @@ import unittest
 # rather as a smoke test.
 # Also, any bugfixes should include a dedicated test to verify the fix
 
+#####################################################################
+
+# This is a heavily stripped down version of subprocess.run to be usable with Python 3.4
+
+
+class CompletedProcess(object):
+    def __init__(self, args, returncode, stdout=None, stderr=None):
+        self.args = args
+        self.returncode = returncode
+        self.stdout = stdout
+        self.stderr = stderr
+
+
+def subprocess_run(*popenargs, **kwargs):
+    with subprocess.Popen(*popenargs, **kwargs) as process:
+        try:
+            stdout, stderr = process.communicate()
+        except:
+            process.kill()
+            process.wait()
+            raise
+        retcode = process.poll()
+    return CompletedProcess(process.args, retcode, stdout, stderr)
+
+#####################################################################
+
 
 class FirstTestCase(unittest.TestCase):
     @classmethod
@@ -29,7 +55,7 @@ class FirstTestCase(unittest.TestCase):
         self.assertTrue(os.path.isfile(os.path.join(self._example1_dir, 'setup.py')))
 
     def _run_script(self, args):
-        return subprocess.run(
+        return subprocess_run(
             [sys.executable, self._script] + args,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
