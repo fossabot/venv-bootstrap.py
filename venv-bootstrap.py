@@ -38,24 +38,12 @@ if sys.version_info < (3, 5):
     sys.exit("Sorry, venv-bootstrap.py requires at least Python 3.5")
 
 import argparse
+import contextlib
 import os
 import runpy
 import signal
 import subprocess
 import venv
-
-
-# verbatim copy from ensure_pip
-def disable_pip_configuration_settings():
-    # We deliberately ignore all pip environment variables
-    # when invoking pip
-    # See http://bugs.python.org/issue19734 for details
-    keys_to_remove = [k for k in os.environ if k.startswith("PIP_")]
-    for k in keys_to_remove:
-        del os.environ[k]
-    # We also ignore the settings in the default pip configuration file
-    # See http://bugs.python.org/issue20053 for details
-    os.environ['PIP_CONFIG_FILE'] = os.devnull
 
 
 class EnvBuilder(venv.EnvBuilder):
@@ -147,8 +135,6 @@ if args.child:
 
     pip_verbose = ['--verbose'] * args.pip_verbosity
 
-    disable_pip_configuration_settings()
-
     do_bootstrap = False
     try:
         import pip
@@ -164,14 +150,18 @@ if args.child:
         # note: ensurepip cannot be executed in-process, as it imports pip from
         # a temporary copy of a wheel which is destroyed upon return, leaving
         # no non-hackish ways of using pip afterwards.
-        subprocess.check_call([sys.executable, '-m', 'ensurepip', '--altinstall'] + pip_verbose)
+        subprocess.check_call(
+            [sys.executable, '-m', 'ensurepip', '--altinstall'] + pip_verbose,
+            stdout=sys.stderr
+        )
 
         import pip  # noqa
 
     import shlex
 
-    if pip.main(pip_verbose + ['install'] + shlex.split(args.install)):
-        error()
+    with contextlib.redirect_stdout(sys.stderr):
+        if pip.main(pip_verbose + ['--isolated', 'install'] + shlex.split(args.install)):
+            error()
 
     try:
         run_and_exit()
