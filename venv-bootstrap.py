@@ -34,8 +34,8 @@
 
 import sys
 
-if sys.version_info < (3, 5):
-    sys.exit("Sorry, venv-bootstrap.py requires at least Python 3.5")
+if sys.version_info < (3, 4):
+    sys.exit("Sorry, venv-bootstrap.py requires at least Python 3.4")
 
 import argparse
 import contextlib
