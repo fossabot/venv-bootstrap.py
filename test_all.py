@@ -13,6 +13,7 @@ import unittest
 
 # This is a heavily stripped down version of subprocess.run to be usable with Python 3.4
 
+VERBOSE_SUBPROCESS = os.environ.get("VERBOSE_SUBPROCESS")
 
 class CompletedProcess(object):
     def __init__(self, args, returncode, stdout=None, stderr=None):
@@ -31,6 +32,10 @@ def subprocess_run(*popenargs, **kwargs):
             process.wait()
             raise
         retcode = process.poll()
+    if VERBOSE_SUBPROCESS:
+        print(popenargs[0], ' -> ', retcode)
+        print("=== stdout: ==\n", stdout.decode())
+        print("=== stderr: ==\n", stderr.decode())
     return CompletedProcess(process.args, retcode, stdout, stderr)
 
 #####################################################################

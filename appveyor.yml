@@ -1,5 +1,7 @@
 shallow_clone: true
 environment:
+    global:
+        VERBOSE_SUBPROCESS: 1
     matrix:
         - PYTHON: "C:/Python34-x64"
         - PYTHON: "C:/Python35-x64"
