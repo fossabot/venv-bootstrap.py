@@ -160,7 +160,7 @@ if args.child:
     import shlex
 
     with contextlib.redirect_stdout(sys.stderr):
-        if pip.main(pip_verbose + ['--isolated', 'install'] + shlex.split(args.install)):
+        if pip.main(pip_verbose + ['--isolated', 'install'] + shlex.split(args.install, posix=False)):
             error()
 
     try:
