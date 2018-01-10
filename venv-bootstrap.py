@@ -151,7 +151,7 @@ if args.child:
         # a temporary copy of a wheel which is destroyed upon return, leaving
         # no non-hackish ways of using pip afterwards.
         subprocess.check_call(
-            [sys.executable, '-m', 'ensurepip', '--altinstall'] + pip_verbose,
+            [sys.executable, '-m', 'ensurepip', '--altinstall', '--upgrade'] + pip_verbose,
             stdout=sys.stderr
         )
 
