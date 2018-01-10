@@ -86,7 +86,8 @@ class FirstTestCase(unittest.TestCase):
         self.assertEqual(er.stdout, '')
 
     def test_example1_pip_install_error(self):
-        er = self._run_script(['some_module', os.path.devnull])
+        # note: a uuid is used as something that should not be installable by pip
+        er = self._run_script(['some_module', '05da04ff-f259-4f09-889b-f9a41daa1703'])
         self.assertEqual(er.returncode, 2)
         self.assertEqual(er.stdout, '')
 
