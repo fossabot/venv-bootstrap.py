@@ -55,6 +55,15 @@ class FirstTestCase(unittest.TestCase):
         self.assertTrue(os.path.isfile(os.path.join(self._example1_dir, 'setup.py')))
 
     def _run_script(self, args):
+        def convert(i):
+            if isinstance(i, str):
+                return i
+            if isinstance(i, bytes):
+                return i.decode()
+            return str(i)
+
+        args = [convert(i) for i in args]
+
         return subprocess_run(
             [sys.executable, self._script] + args,
             stdout=subprocess.PIPE,
@@ -71,7 +80,7 @@ class FirstTestCase(unittest.TestCase):
     def test_example1_fail(self):
         MESSAGE = b'stderr message'
         CODE = 42
-        er = self._run_script(['venv_bootstrap_py_example1', self._example1_dir, 'fail', '--message', MESSAGE, '--code', str(CODE)])
+        er = self._run_script(['venv_bootstrap_py_example1', self._example1_dir, 'fail', '--message', MESSAGE, '--code', CODE])
         self.assertEqual(er.returncode, CODE)
         self.assertTrue(er.stderr.endswith(MESSAGE + b'\n'))
         self.assertEqual(er.stdout, b'')
