@@ -88,6 +88,11 @@ parser.add_argument(
     help='number of -v options to pass to "pip", including via "ensurepip" (default: %(default)s)'
 )
 parser.add_argument(
+    '--no-pip-upgrade',
+    action='store_true',
+    help="do not upgrade setuptools and pip during bootstrap"
+)
+parser.add_argument(
     '--fail-code',
     metavar="N",
     type=int,
@@ -151,9 +156,15 @@ if args.child:
         # a temporary copy of a wheel which is destroyed upon return, leaving
         # no non-hackish ways of using pip afterwards.
         subprocess.check_call(
-            [sys.executable, '-m', 'ensurepip', '--altinstall', '--upgrade'] + pip_verbose,
+            [sys.executable, '-m', 'ensurepip', '--altinstall'] + pip_verbose,
             stdout=sys.stderr
         )
+
+        if not args.no_pip_upgrade:
+            subprocess.check_call(
+                [sys.executable, '-m', 'pip'] + pip_verbose + ['--isolated', 'install', '--upgrade', 'setuptools', 'pip'],
+                stdout=sys.stderr
+            )
 
         import pip  # noqa
 
