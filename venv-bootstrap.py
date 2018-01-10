@@ -161,11 +161,14 @@ if args.child:
         )
 
         if not args.no_pip_upgrade:
-            for i in ['setuptools', 'pip']:
-                subprocess.check_call(
-                    [sys.executable, '-m', 'pip'] + pip_verbose + ['--isolated', 'install', '--upgrade', i],
-                    stdout=sys.stderr
-                )
+            subprocess.check_call(
+                [sys.executable, '-m', 'pip'] + pip_verbose + ['--isolated', 'install', '--upgrade', 'setuptools'],
+                stdout=sys.stderr
+            )
+            subprocess.check_call(
+                [sys.executable, '-m', 'easy_install', '--upgrade', 'pip'],
+                stdout=sys.stderr
+            )
 
         import pip  # noqa
 
