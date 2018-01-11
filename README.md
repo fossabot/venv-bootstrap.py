@@ -1,4 +1,4 @@
-[![linux test status](https://img.shields.io/travis/kshpytsya/venv-bootstrap-py.svg?label=Linux)](https://travis-ci.org/kshpytsya/venv-bootstrap.py) [![windows test status](https://img.shields.io/appveyor/ci/kshpytsya/venv-bootstrap-py.svg?label=Windows&logo=appveyor)](https://ci.appveyor.com/project/kshpytsya/venv-bootstrap-py)
+[![linux test status](https://img.shields.io/travis/kshpytsya/venv-bootstrap.py.svg?label=Linux)](https://travis-ci.org/kshpytsya/venv-bootstrap.py) [![windows test status](https://img.shields.io/appveyor/ci/kshpytsya/venv-bootstrap-py.svg?label=Windows&logo=appveyor)](https://ci.appveyor.com/project/kshpytsya/venv-bootstrap-py)
 
 
 
