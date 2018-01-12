@@ -18,4 +18,4 @@ deploy:
   on:
     repo: kshpytsya/venv-bootstrap.py
     tags: true
-    python: latest
+    python: 3.6
