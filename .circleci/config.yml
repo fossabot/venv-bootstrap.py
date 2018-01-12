@@ -5,6 +5,8 @@ jobs:
             xcode: "9.0"
         steps:
             - checkout
-            - run: |
-                brew install python3
-                python3 -V
+            - run: brew install python3
+            - run: python3 -V
+            - run: python3 venv-bootstrap.py --version
+            - run: python3 venv-bootstrap.py --help
+            - run: python3 -m unittest
