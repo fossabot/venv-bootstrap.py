@@ -8,6 +8,8 @@ python:
   - "3.6"
 script:
   - "sed s:@@@VERSION@@@:$(git describe --tags): -i venv-bootstrap.py"
+  - python venv-bootstrap.py --version
+  - python venv-bootstrap.py --help
   - python -m unittest
 deploy:
   provider: releases
