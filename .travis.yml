@@ -7,4 +7,13 @@ python:
   - "3.5"
   - "3.6"
 script:
-    - python -m unittest
+  - python -m unittest
+deploy:
+  provider: releases
+  api_key:
+    secure: fnx4Q/8sfmPbyx2FU/ZSoYCq2OwJKS7uiVCyuCGEvEXlyADMRRL2f4Fk7twnPLTJshaZSLE+K5PvU7wMirE6rk0VqC27VyFvaghIUwlyr/VwzgIMXEZUqthiQS/9GNnK927fecnB9NfCroYHcUVHOyxDQRGx0byezaHaq9UIlbDx1aCt5Sklo4qtijaxpL2VIqtLcuAitqC8uVKd2xXgSbPZtRYOvj9uxwsPDsKP+uh9M10ehQQMbUvXApftRJAE6GlXWSSlrnsRFgv/p2SEFKkGxwqP36W5DDIfJx+SOgkMWjchAG71zaFSV5f1mNJkVbdequV+WUCEz9/G+yqeBbz/r93A+WvJHhRex2OUYtRE6UtbqhD70+YLzlzpDYLrIPwO92YS2NpUN4diS94MVc0qTSn9fAt2mYSFQGdFiLThcmgQ/sQDJstkQRM6D3SdHWxTpzBEItFiJFztKh45uWiwPshzcZddq+ybnHZ+8pY2XChJ05SxxlMVpEU4KNSflNFjQG4lMLpQlvcHOssBmrkxMspZi+zCTJqoCOXpNOkxCdlz7RFmfUqb5HjvI6taDd1lrJUvdUatHkUgrIBoFG0nCfnaApaUNySr/n8K7XSNuIbKzS9MzZrfGgGRfZy9kOfK9WpKLEzubU6DnODhYBMwxcufvFbOa3Bf3N0QQKY=
+  file: venv-bootstrap.py
+  skip_cleanup: true
+  on:
+    repo: kshpytsya/venv-bootstrap.py
+    tags: true
