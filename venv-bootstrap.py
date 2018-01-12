@@ -24,9 +24,17 @@
 #
 #################################################################################
 
+VERSION="@@@VERSION@@@"
+
 # This file can be obtained as
 #
-#    https://github.com/kshpytsya/venv-bootstrap.py/raw/master/venv-bootstrap.py
+#    https://github.com/kshpytsya/venv-bootstrap.py/releases/download/@@@VERSION@@@/venv-bootstrap.py
+#
+# or you can get the latest release at
+#
+#    https://github.com/kshpytsya/venv-bootstrap.py/releases/latest
+#
+# (regretfully, github does not support direct links to files in latest release)
 #
 # and executed as
 #
@@ -62,6 +70,11 @@ default_venv_for_display = default_venv_prefix + "<module>"
 parser = argparse.ArgumentParser(
     description='a portable and streamlined version of '
                 '"python -m venv <env> && <env>/bin/pip install <install>" && <env>/bin/python -m <module> ..."',
+)
+parser.add_argument(
+    '--version',
+    action='version',
+    version='%(prog)s ' + VERSION
 )
 parser.add_argument(
     'module',

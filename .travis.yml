@@ -7,6 +7,7 @@ python:
   - "3.5"
   - "3.6"
 script:
+  - "sed s:@@@VERSION@@@:$(git describe --tags): -i venv-bootstrap.py"
   - python -m unittest
 deploy:
   provider: releases
@@ -17,3 +18,4 @@ deploy:
   on:
     repo: kshpytsya/venv-bootstrap.py
     tags: true
+    python: latest
