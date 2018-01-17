@@ -9,8 +9,7 @@ python:
   - "3.6"
 script:
   - pyb analyze install
-  - ls "target/dist/*/dist/*.tar.gz" || true
-  - find target
+  - ls target/dist/*/dist/*.tar.gz
   - venv-bootstrap-install --version
 deploy:
   provider: releases
