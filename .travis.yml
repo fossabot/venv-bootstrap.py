@@ -8,8 +8,9 @@ python:
   - "3.5"
   - "3.6"
 script:
-  - pyb analyze publish
+  - pyb analyze install
   - ls "target/dist/*/dist/*.tar.gz"
+  - venv-bootstrap-install --version
 deploy:
   provider: releases
   api_key:
