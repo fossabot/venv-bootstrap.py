@@ -1,9 +1,9 @@
 import os
-import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from venv_bootstrap.installer import Installer
 
 # Note: this is not intended as an exhaustive test suite but
 # rather as a smoke test.
@@ -24,16 +24,23 @@ class CompletedProcess(object):
 class FirstTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._example1_dir = os.path.join(os.path.dirname(__file__), 'example1')
+        cls._example1_dir = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'example1')
 
         cls._tempdir = tempfile.TemporaryDirectory()
-        SCRIPT = 'venv-bootstrap.py'
-        shutil.copy(os.path.join(os.path.dirname(__file__), SCRIPT), cls._tempdir.name)
-        cls._script = os.path.join(cls._tempdir.name, SCRIPT)
+        installer = Installer(cls._tempdir.name)
+        cls._installer_check_result1 = installer.check()
+        installer.install()
+        cls._installer_check_result2 = installer.check()
+
+        cls._script = installer.fname
 
     @classmethod
     def tearDownClass(cls):
         cls._tempdir.cleanup()
+
+    def test_installer_results(self):
+        self.assertEqual(self._installer_check_result1, 'absent')
+        self.assertEqual(self._installer_check_result2, 'version-same')
 
     def test_example1_exists(self):
         self.assertTrue(os.path.isdir(self._example1_dir))
@@ -57,7 +64,7 @@ class FirstTestCase(unittest.TestCase):
         ) as process:
             try:
                 stdout, stderr = process.communicate()
-            except:
+            except:  # noqa
                 process.kill()
                 process.wait()
                 raise

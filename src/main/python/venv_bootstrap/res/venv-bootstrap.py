@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #################################################################################
 #
 #  MIT License
@@ -24,7 +25,7 @@
 #
 #################################################################################
 
-VERSION="@@@VERSION@@@"
+VERSION = "@@@VERSION@@@"
 
 # This file can be obtained as
 #
@@ -39,6 +40,8 @@ VERSION="@@@VERSION@@@"
 # and executed as
 #
 #    python3 venv-bootstrap.py ...
+
+# @@@UUID@@@
 
 import sys
 
