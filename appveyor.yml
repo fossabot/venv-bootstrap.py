@@ -9,10 +9,10 @@ environment:
 install:
     - "pip install --disable-pip-version-check --user --upgrade pip"
     - "pip install pybuilder"
-build:
+build_script:
     - "pyb_ analyze publish install"
 test_script:
     - "venv-bootstrap-install --version"
     - "mkdir testdir"
-    - "venv-bootstrap-install --no-interactive github-release"
+    - "venv-bootstrap-install --no-interactive testdir"
     - "python testdir/venv-bootstrap.py --version"
