@@ -9,6 +9,10 @@ VERSION = pkg_resources.parse_version(__version__)
 MAX_READ = 1000000
 
 
+def _nop_msg_cb(msg):
+    pass
+
+
 class Installer:
     _script = None
 
@@ -33,7 +37,7 @@ class Installer:
         if os.path.isdir(self.fname):
             return 'a-dir'
 
-        if not os.path.exists(self.fname):
+        if not os.path.lexists(self.fname):
             return 'absent'
 
         if os.path.islink(self.fname):
@@ -68,9 +72,89 @@ class Installer:
 
         return 'version-same-modified'
 
-    @staticmethod
-    def decide(check_result, *, upgrade=False):
-        pass
+    def maybe_install(
+        self,
+        *,
+        check_result=None,
+        no_upgrade=False,
+        downgrade=False,
+        force=False,
+        confirm_cb=None,
+        info_cb=_nop_msg_cb,
+        warn_cb=_nop_msg_cb,
+        error_cb=_nop_msg_cb
+    ):
+        if check_result is None:
+            check_result = self.check()
+
+        def should_install():
+            if check_result == 'absent':
+                info_cb('installing into "{}"'.format(self.path))
+                return True
+
+            if check_result == 'version-same':
+                info_cb('already installed in "{}"'.format(self.path))
+                return False
+
+            if check_result == 'no-dir':
+                error_cb('directory "{}" does not exist'.format(self.path))
+                return False
+
+            if check_result == 'a-dir':
+                error_cb('target "{}" exists and is a directory'.format(self.fname))
+                return False
+
+            MAP = {
+                'read-error': 'non-readable file "{}"',
+                'a-link': 'existing symlink "{}"',
+                'not-our': '"{}" missing our signature',
+                'version-unknown': '"{}" missing version info',
+                'version-same-modified': '"{}" having the same version but modified contents',
+            }
+
+            if check_result in MAP:
+                what = MAP[check_result].format(self.fname)
+                if force:
+                    warn_cb('overwriting {}'.format(what))
+                    return True
+
+                if confirm_cb:
+                    if confirm_cb('overwrite {} ?'.format(what)):
+                        info_cb('installing into "{}"'.format(self.path))
+                        return True
+                    else:
+                        info_cb('skipping installation into "{}"'.format(self.path))
+                        return False
+
+                error_cb('cowardly refusing to overwrite {}'.format(what))
+                return False
+
+            if check_result == 'version-older':
+                if no_upgrade:
+                    info_cb('not upgrading existing "{}"'.format(self.fname))
+                    return False
+                else:
+                    info_cb('upgrading existing "{}"'.format(self.fname))
+                    return True
+
+            if check_result == 'version-newer':
+                nonlocal downgrade
+                if not downgrade and confirm_cb:
+                    downgrade = confirm_cb('downgrade existing "{}" ?'.format(self.fname))
+
+                if downgrade:
+                    info_cb('downgrading existing "{}"'.format(self.fname))
+                    return True
+                else:
+                    info_cb('not downgrading existing "{}"'.format(self.fname))
+                    return False
+
+            assert 0, "unknown check result: {}".format(check_result)
+
+        decision = should_install()
+        assert decision is not None
+        if decision:
+            self.install()
 
     def install(self):
         tmp_fname = os.path.join(self.path, '.{}.{}'.format(SCRIPT_FNAME, os.getpid()))

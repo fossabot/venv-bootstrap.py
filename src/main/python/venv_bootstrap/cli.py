@@ -1,4 +1,5 @@
 import click
+import sys
 from .installer import Installer
 
 
@@ -12,19 +13,38 @@ from .installer import Installer
 @click.argument('dir', nargs=-1, type=click.Path(exists=True, file_okay=False, resolve_path=True))
 def main(**args):
     """install venv-bootstrap.py script into specified directories"""
+
+    errors = 0
+
     def info(msg):
         if not args["quiet"]:
-            click.secho(msg, bold=True)
+            click.secho(msg)
+
+    def warn(msg):
+        click.secho("warning: {}".format(msg), fg='yellow')
+
+    def error(msg):
+        nonlocal errors
+        errors += 1
+        click.secho("error: {}".format(msg), fg='red')
 
     if not args["dir"]:
-        info("warning: no directories supplied")
+        warn("no directories supplied")
+
+    errors = 0
 
     for i in args["dir"]:
         installer = Installer(i)
 
-        check_result = installer.check()
+        installer.maybe_install(
+            no_upgrade=args["no_upgrade"],
+            downgrade=args["downgrade"],
+            force=args["force"],
+            confirm_cb=None if args["no_interactive"] else lambda msg: click.confirm(msg),
+            info_cb=info,
+            warn_cb=warn,
+            error_cb=error
+        )
 
-        info("{}: {}".format(installer.fname, check_result))
-
-        if args["force"]:
-            installer.install()
+    if errors:
+        sys.exit(1)

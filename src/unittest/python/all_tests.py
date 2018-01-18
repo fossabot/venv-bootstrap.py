@@ -3,13 +3,96 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from venv_bootstrap.installer import Installer
+import venv_bootstrap
+from venv_bootstrap.installer import Installer, SCRIPT_UUID
 
 # Note: this is not intended as an exhaustive test suite but
 # rather as a smoke test.
 # Also, any bugfixes should include a dedicated test to verify the fix
 
 VERBOSE_SUBPROCESS = os.environ.get("VERBOSE_SUBPROCESS")
+
+
+class InstallerCheckTestCase(unittest.TestCase):
+    def test_no_dir(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.assertEqual(Installer(os.path.join(tmpdir, "nonexistent")).check(), 'no-dir')
+
+    def test_absent(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            installer = Installer(tmpdir)
+            self.assertEqual(installer.check(), 'absent')
+
+    def test_a_dir(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            installer = Installer(tmpdir)
+            os.mkdir(installer.fname)
+            self.assertEqual(installer.check(), 'a-dir')
+
+    @unittest.skipIf(os.name == 'nt', "symlinks are not supported on Windows")
+    def test_a_link_existing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            installer = Installer(tmpdir)
+            target = installer.fname + ".target"
+            open(target, 'wb').close()
+            os.symlink(target, installer.fname)
+            self.assertEqual(installer.check(), 'a-link')
+
+    @unittest.skipIf(os.name == 'nt', "symlinks are not supported on Windows")
+    def test_a_link_broken(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            installer = Installer(tmpdir)
+            target = installer.fname + ".target"
+            os.symlink(target, installer.fname)
+            self.assertEqual(installer.check(), 'a-link')
+
+    @unittest.skipIf(os.name == 'nt', "chmod is not properly supported on Windows")
+    def test_read_error(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            installer = Installer(tmpdir)
+            open(installer.fname, "wb").close()
+            os.chmod(installer.fname, 0)
+            self.assertEqual(installer.check(), 'read-error')
+
+    def test_not_our(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            installer = Installer(tmpdir)
+            open(installer.fname, "wb").close()
+            self.assertEqual(installer.check(), 'not-our')
+
+    def test_version_unknown(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            installer = Installer(tmpdir)
+            with open(installer.fname, "wb") as f:
+                f.write(SCRIPT_UUID)
+            self.assertEqual(installer.check(), 'version-unknown')
+
+    def test_version_same(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            installer = Installer(tmpdir)
+            installer.install()
+            self.assertEqual(installer.check(), 'version-same')
+
+    def test_version_same_modified(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            installer = Installer(tmpdir)
+            with open(installer.fname, "wb") as f:
+                f.writelines([SCRIPT_UUID, b'\nVERSION = "', venv_bootstrap.__version__.encode(), b'"\n'])
+            self.assertEqual(installer.check(), 'version-same-modified')
+
+    def test_version_older(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            installer = Installer(tmpdir)
+            with open(installer.fname, "wb") as f:
+                f.writelines([SCRIPT_UUID, b'\nVERSION = "0.1"\n'])
+            self.assertEqual(installer.check(), 'version-older')
+
+    def test_version_newer(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            installer = Installer(tmpdir)
+            with open(installer.fname, "wb") as f:
+                f.writelines([SCRIPT_UUID, b'\nVERSION = "99999999.0"\n'])
+            self.assertEqual(installer.check(), 'version-newer')
 
 
 class CompletedProcess(object):
@@ -21,7 +104,7 @@ class CompletedProcess(object):
         self.stderr = stderr
 
 
-class FirstTestCase(unittest.TestCase):
+class BootstrapTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._example1_dir = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'example1')
