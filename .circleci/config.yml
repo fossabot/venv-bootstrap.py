@@ -7,6 +7,9 @@ jobs:
             - checkout
             - run: brew install python3
             - run: python3 -V
-            - run: python3 venv-bootstrap.py --version
-            - run: python3 venv-bootstrap.py --help
-            - run: python3 -m unittest
+            - run: pip3 install pybuilder
+            - run: pyb analyze publish install
+            - run: venv-bootstrap-install --version
+            - run: mkdir testdir"
+            - run: venv-bootstrap-install --no-interactive github-release
+            - run: python3 testdir/venv-bootstrap.py --version
