@@ -10,6 +10,6 @@ jobs:
             - run: pip3 install pybuilder
             - run: pyb analyze publish install
             - run: venv-bootstrap-install --version
-            - run: mkdir testdir"
+            - run: mkdir testdir
             - run: venv-bootstrap-install --no-interactive github-release
             - run: python3 testdir/venv-bootstrap.py --version
