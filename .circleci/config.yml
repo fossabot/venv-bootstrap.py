@@ -11,5 +11,5 @@ jobs:
             - run: pyb analyze publish install
             - run: venv-bootstrap-install --version
             - run: mkdir testdir
-            - run: venv-bootstrap-install --no-interactive github-release
+            - run: venv-bootstrap-install --no-interactive testdir
             - run: python3 testdir/venv-bootstrap.py --version
