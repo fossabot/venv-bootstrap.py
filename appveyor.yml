@@ -9,7 +9,7 @@ init:
     - "set PATH=%PYTHON%/scripts;%PATH%"
 install:
     - "pip install --disable-pip-version-check --user --upgrade pip"
-    - "pip install pybuilder"
+    - "pip install pybuilder pybuilder_scm_ver_plugin"
 build_script:
     - "pyb_ analyze publish install"
 test_script:
