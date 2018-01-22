@@ -37,6 +37,6 @@ def set_properties(project):
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: Only',
+        'Programming Language :: Python 3 :: Only',
         'Topic :: Software Development :: Build Tools'
     ])
