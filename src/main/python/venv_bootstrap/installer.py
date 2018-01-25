@@ -1,6 +1,7 @@
 import os
 import pkg_resources
 import re
+from atomicwrites import atomic_write
 from . import __version__
 
 SCRIPT_UUID = b"2ca11a4f-5d89-4cc9-bb4c-f50f65c62119"
@@ -157,7 +158,5 @@ class Installer:
             self.install()
 
     def install(self):
-        tmp_fname = os.path.join(self.path, '.{}.{}'.format(SCRIPT_FNAME, os.getpid()))
-        with open(tmp_fname, "wb") as f:
+        with atomic_write(self.fname, mode='wb', overwrite=True) as f:
             f.write(self.get_script())
-        os.rename(tmp_fname, self.fname)

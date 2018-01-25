@@ -20,6 +20,7 @@ url = "https://github.com/kshpytsya/venv-bootstrap.py"
 
 @init
 def set_properties(project):
+    project.depends_on('atomicwrites>=1.1.5,<2')
     project.depends_on('click', '==6.*')
 
     project.set_property('flake8_break_build', True)
