@@ -8,7 +8,7 @@ python:
   - "3.5"
   - "3.6"
 script:
-  - pyb analyze publish install
+  - pyb install_dependencies analyze publish install
   - venv-bootstrap-install --version
   - mkdir github-release
   - cp target/dist/*/dist/*.tar.gz github-release
